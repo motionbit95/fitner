@@ -43,12 +43,15 @@ function Find(props) {
   const [imageList, setImageList] = useState([]);
   const imageRef = useRef(null);
 
+  const [data, setData] = useState({});
+
   useEffect(() => {
     if (location.state) {
       if (location.state.isSurvey) {
         navigate(`/find/1`);
       }
       if (location.state.healthData && location.state.medicineData) {
+        setData(location.state);
         navigate(`/find/2`);
       }
     }
@@ -59,20 +62,12 @@ function Find(props) {
   }, [window.location.pathname]);
 
   const handleSubmit = () => {
+    console.log(data, imageList);
     addDocument("codef_result", {
       uid: auth?.currentUser?.uid,
-      health:
-        location.state && location.state.healthData
-          ? location.state.healthData
-          : {},
-      medicine:
-        location.state && location.state.medicineData
-          ? location.state.medicineData
-          : [],
-      user:
-        location.state && location.state.formInput
-          ? location.state.formInput
-          : {},
+      health: data?.healthData ? data?.healthData : {},
+      medicine: data?.medicineData ? data?.medicineData : [],
+      user: data?.formInput ? data?.formInput : {},
       createdAt: new Date(),
       image: imageList ? imageList : [],
     }).then(async () => {

@@ -394,6 +394,7 @@ export const Confirm = (props) => {
   };
 
   const handleSubmit = () => {
+    console.log(healthData, medicineData, formInput);
     navigate("/find/2", {
       state: {
         healthData: healthData,

@@ -52,26 +52,17 @@ export const MemberTable = (props: any) => {
 
   const [newList, setNewList] = React.useState<any>([]);
 
-  const [detailItem, setDetailItem] = React.useState<any>({});
+  const [detailItem, setDetailItem] = React.useState<any>(null);
 
   useEffect(() => {
     list.map((member: any, index: number) => {
-      // console.log(member.uid);
       getAllDoc2("survey_result").then((data) => {
         const result = data.filter((item: any) => item.uid === member.uid);
-
         list[index] = { ...list[index], answer: result?.[0] };
-        // setData(data);
-
         setNewList(list);
       });
     });
   }, [list]);
-
-  useEffect(() => {
-    console.log(newList);
-  }, [newList]);
-
   return (
     <>
       <Table {...props} size={"sm"}>
@@ -104,8 +95,8 @@ export const MemberTable = (props: any) => {
           </Tr>
         </Thead>
         <Tbody>
-          {newList.map((member: any) => (
-            <Tr key={member.uid}>
+          {newList.map((member: any, index: number) => (
+            <Tr key={index}>
               <Td textAlign={"center"}>{member.user.userName}</Td>
               <Td textAlign={"center"}>{member.user.identity}</Td>
               <Td textAlign={"center"}>{member.user.phoneNo}</Td>
@@ -156,12 +147,10 @@ export const MemberTable = (props: any) => {
                 {member.medicine ? (
                   <Button
                     onClick={() => {
+                      setDetailItem(null);
                       setType(2);
                       try {
-                        member.medicine.map((item: any) => {
-                          console.log(item);
-                        });
-
+                        console.log(member.medicine);
                         setData(member.medicine);
                         onOpen();
                       } catch (error) {
@@ -225,8 +214,8 @@ export const MemberTable = (props: any) => {
             {type === 0 ? (
               <>
                 <Stack spacing={4}>
-                  {data.answer?.map((answer: any) => (
-                    <Stack key={answer.question}>
+                  {data.answer?.map((answer: any, id: number) => (
+                    <Stack key={id}>
                       <Text>Q. {answer.question}</Text>
                       <Text>A. {answer.answer}</Text>
                     </Stack>
@@ -236,13 +225,14 @@ export const MemberTable = (props: any) => {
             ) : type === 1 ? (
               <>
                 <Stack spacing={4}>
-                  {data.health.resPreviewList?.map((health: any) => (
-                    <Card key={health.resId}>
-                      <CardHeader fontSize={"lg"} fontWeight={"bold"}>
-                        한눈에 보기
-                      </CardHeader>
-                      <CardBody>
-                        {/* <Stack>
+                  {data.health.resPreviewList?.map(
+                    (health: any, id: number) => (
+                      <Card key={id}>
+                        <CardHeader fontSize={"lg"} fontWeight={"bold"}>
+                          한눈에 보기
+                        </CardHeader>
+                        <CardBody>
+                          {/* <Stack>
                           <Text>검진년도 : {health.resCheckupYear}</Text>
                           <Text>검진일자 : {health.resCheckupDate}</Text>
                           <Text>검진장소 : {health.resCheckupPlace}</Text>
@@ -281,642 +271,652 @@ export const MemberTable = (props: any) => {
                           <Text>골다공증 : {health.resOsteoporosis}</Text>
                           <Text>판정 : {health.resJudgement}</Text>
                         </Stack> */}
-                        <Stack>
-                          <Grid
-                            templateRows="repeat(2, 1fr)"
-                            templateColumns="repeat(4, 1fr)"
-                          >
-                            <GridItem
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderRight={"none"}
+                          <Stack>
+                            <Grid
+                              templateRows="repeat(2, 1fr)"
+                              templateColumns="repeat(4, 1fr)"
                             >
-                              <Center>
-                                <Text>수검자 성명</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>{data.health.resCheckupTarget}</Text>
-                              </Center>
-                            </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>수검자 성명</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>{data.health.resCheckupTarget}</Text>
+                                </Center>
+                              </GridItem>
 
-                            <GridItem
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>검진일자</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem colSpan={1} border={"1px solid #d9d9d9"}>
-                              <Center>
-                                <Text>
-                                  {health.resCheckupYear}년{" "}
-                                  {health.resCheckupDate.substring(0, 2)}월{" "}
-                                  {health.resCheckupDate.substring(2, 4)}일
-                                </Text>
-                              </Center>
-                            </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>검진일자</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                              >
+                                <Center>
+                                  <Text>
+                                    {health.resCheckupYear}년{" "}
+                                    {health.resCheckupDate.substring(0, 2)}월{" "}
+                                    {health.resCheckupDate.substring(2, 4)}일
+                                  </Text>
+                                </Center>
+                              </GridItem>
 
-                            <GridItem
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderRight={"none"}
-                              borderTop={"none"}
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderRight={"none"}
+                                borderTop={"none"}
+                              >
+                                <Center>
+                                  <Text>판정</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                              >
+                                <Center>
+                                  <Text>{health.resJudgement}</Text>
+                                </Center>
+                              </GridItem>
+                            </Grid>
+                            <Grid
+                              // h="200px"
+                              templateRows="repeat(7, 1fr)"
+                              templateColumns="repeat(6, 1fr)"
+                              // gap={4}
                             >
-                              <Center>
-                                <Text>판정</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                            >
-                              <Center>
-                                <Text>{health.resJudgement}</Text>
-                              </Center>
-                            </GridItem>
-                          </Grid>
-                          <Grid
-                            // h="200px"
-                            templateRows="repeat(7, 1fr)"
-                            templateColumns="repeat(6, 1fr)"
-                            // gap={4}
-                          >
-                            <GridItem
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>구분</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>목표질환</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>검사항목</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem colSpan={3} border={"1px solid #d9d9d9"}>
-                              <Center>
-                                <Text>결과(참고치)</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              rowSpan={6}
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center h="100%">
-                                <Text>계측검사</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              rowSpan={3}
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center h="100%">
-                                <Text>비만/복부비만</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              rowSpan={1}
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center h="100%">
-                                <Text>키 (cm) 및 몸무게(kg)</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={3}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                            >
-                              <Center h="100%">
-                                <Text>
-                                  {health.resHeight} / {health.resWeight}
-                                </Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>체질량지수(kg/㎡)</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={3}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                            >
-                              <Center>
-                                <Text>{health.resBMI}</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>허리둘레(cm)</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={3}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                            >
-                              <Center>
-                                <Text>{health.resWaist}</Text>
-                              </Center>
-                            </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>구분</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>목표질환</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>검사항목</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={3}
+                                border={"1px solid #d9d9d9"}
+                              >
+                                <Center>
+                                  <Text>결과(참고치)</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                rowSpan={6}
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center h="100%">
+                                  <Text>계측검사</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                rowSpan={3}
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center h="100%">
+                                  <Text>비만/복부비만</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                rowSpan={1}
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center h="100%">
+                                  <Text>키 (cm) 및 몸무게(kg)</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={3}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                              >
+                                <Center h="100%">
+                                  <Text>
+                                    {health.resHeight} / {health.resWeight}
+                                  </Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>체질량지수(kg/㎡)</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={3}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                              >
+                                <Center>
+                                  <Text>{health.resBMI}</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>허리둘레(cm)</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={3}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                              >
+                                <Center>
+                                  <Text>{health.resWaist}</Text>
+                                </Center>
+                              </GridItem>
 
-                            <GridItem
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>시력(좌우)</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={4}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                              >
+                                <Center>
+                                  <Text>{health.resSight}</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>청력(좌우)</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={4}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                              >
+                                <Center>
+                                  <Text>{health.resHearing}</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>고혈압 (수축기/이완기)</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={4}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                              >
+                                <Center>
+                                  <Text>
+                                    {health.resBloodPressure}{" "}
+                                    {
+                                      data.health.resReferenceList[0]
+                                        .resBloodPressure
+                                    }
+                                  </Text>
+                                </Center>
+                              </GridItem>
+                            </Grid>
+                            <Grid
+                              // h="200px"
+                              templateRows="repeat(11, 1fr)"
+                              templateColumns="repeat(6, 1fr)"
+                              // gap={4}
                             >
-                              <Center>
-                                <Text>시력(좌우)</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={4}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                            >
-                              <Center>
-                                <Text>{health.resSight}</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>청력(좌우)</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={4}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                            >
-                              <Center>
-                                <Text>{health.resHearing}</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>고혈압 (수축기/이완기)</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={4}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                            >
-                              <Center>
-                                <Text>
-                                  {health.resBloodPressure}{" "}
-                                  {
-                                    data.health.resReferenceList[0]
-                                      .resBloodPressure
-                                  }
-                                </Text>
-                              </Center>
-                            </GridItem>
-                          </Grid>
-                          <Grid
-                            // h="200px"
-                            templateRows="repeat(11, 1fr)"
-                            templateColumns="repeat(6, 1fr)"
-                            // gap={4}
-                          >
-                            <GridItem
-                              rowSpan={6}
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderRight={"none"}
-                            >
-                              <Center h="100%">
-                                <Text>혈액검사</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              rowSpan={1}
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderRight={"none"}
-                            >
-                              <Center h="100%">
-                                <Text>빈혈 등</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              rowSpan={1}
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderRight={"none"}
-                            >
-                              <Center h="100%">
-                                <Text>혈색소(g/dL)</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem colSpan={3} border={"1px solid #d9d9d9"}>
-                              <Center h="100%">
-                                <Text>{health.resHemoglobin}</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>당뇨병</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>공복혈당(mg/dL)</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={3}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                            >
-                              <Center>
-                                <Text>{health.resFastingBloodSuger}</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={1}
-                              rowSpan={4}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center h="100%">
-                                <Text>이상지질혈증</Text>
-                              </Center>
-                            </GridItem>
+                              <GridItem
+                                rowSpan={6}
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderRight={"none"}
+                              >
+                                <Center h="100%">
+                                  <Text>혈액검사</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                rowSpan={1}
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderRight={"none"}
+                              >
+                                <Center h="100%">
+                                  <Text>빈혈 등</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                rowSpan={1}
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderRight={"none"}
+                              >
+                                <Center h="100%">
+                                  <Text>혈색소(g/dL)</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={3}
+                                border={"1px solid #d9d9d9"}
+                              >
+                                <Center h="100%">
+                                  <Text>{health.resHemoglobin}</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>당뇨병</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>공복혈당(mg/dL)</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={3}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                              >
+                                <Center>
+                                  <Text>{health.resFastingBloodSuger}</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                rowSpan={4}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center h="100%">
+                                  <Text>이상지질혈증</Text>
+                                </Center>
+                              </GridItem>
 
-                            <GridItem
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>총콜레스테롤(mg/dL)</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={3}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                            >
-                              <Center>
-                                <Text>
-                                  {" "}
-                                  {health.resTotalCholesterol
-                                    ? health.resTotalCholesterol
-                                    : "비해당"}
-                                </Text>
-                              </Center>
-                            </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>총콜레스테롤(mg/dL)</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={3}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                              >
+                                <Center>
+                                  <Text>
+                                    {" "}
+                                    {health.resTotalCholesterol
+                                      ? health.resTotalCholesterol
+                                      : "비해당"}
+                                  </Text>
+                                </Center>
+                              </GridItem>
 
-                            <GridItem
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>HDL콜레스테롤</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={3}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                            >
-                              <Center>
-                                <Text>
-                                  {" "}
-                                  {health.resHDLCholesterol
-                                    ? health.resHDLCholesterol
-                                    : "비해당"}
-                                </Text>
-                              </Center>
-                            </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>HDL콜레스테롤</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={3}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                              >
+                                <Center>
+                                  <Text>
+                                    {" "}
+                                    {health.resHDLCholesterol
+                                      ? health.resHDLCholesterol
+                                      : "비해당"}
+                                  </Text>
+                                </Center>
+                              </GridItem>
 
-                            <GridItem
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>LDL콜레스테롤</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={3}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                            >
-                              <Center>
-                                <Text>
-                                  {" "}
-                                  {health.resLDLCholesterol
-                                    ? health.resLDLCholesterol
-                                    : "비해당"}
-                                </Text>
-                              </Center>
-                            </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>LDL콜레스테롤</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={3}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                              >
+                                <Center>
+                                  <Text>
+                                    {" "}
+                                    {health.resLDLCholesterol
+                                      ? health.resLDLCholesterol
+                                      : "비해당"}
+                                  </Text>
+                                </Center>
+                              </GridItem>
 
-                            <GridItem
-                              colSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>중성지방</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={3}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                            >
-                              <Center>
-                                <Text>
-                                  {" "}
-                                  {health.resTriglyceride
-                                    ? health.resTriglyceride
-                                    : "비해당"}
-                                </Text>
-                              </Center>
-                            </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>중성지방</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={3}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                              >
+                                <Center>
+                                  <Text>
+                                    {" "}
+                                    {health.resTriglyceride
+                                      ? health.resTriglyceride
+                                      : "비해당"}
+                                  </Text>
+                                </Center>
+                              </GridItem>
 
-                            <GridItem
-                              colSpan={1}
-                              rowSpan={2}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>신장질환</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={2}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>혈청크레아티닌(mg/dL)</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={3}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                            >
-                              <Center>
-                                <Text>{health.resSerumCreatinine}</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={2}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>신사구체여과율(GFR)</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={3}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                            >
-                              <Center>
-                                <Text>{health.resGFR}</Text>
-                              </Center>
-                            </GridItem>
+                              <GridItem
+                                colSpan={1}
+                                rowSpan={2}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>신장질환</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={2}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>혈청크레아티닌(mg/dL)</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={3}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                              >
+                                <Center>
+                                  <Text>{health.resSerumCreatinine}</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={2}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>신사구체여과율(GFR)</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={3}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                              >
+                                <Center>
+                                  <Text>{health.resGFR}</Text>
+                                </Center>
+                              </GridItem>
 
-                            <GridItem
-                              colSpan={1}
-                              rowSpan={3}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>간장질환</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={2}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>AST(SGOT)</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={3}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                            >
-                              <Center>
-                                <Text>{health.resAST}</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={2}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>ALT(SGPT)</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={3}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                            >
-                              <Center>
-                                <Text>{health.resALT}</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={2}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                              borderRight={"none"}
-                            >
-                              <Center>
-                                <Text>감마지피티(y-GPT)</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={3}
-                              border={"1px solid #d9d9d9"}
-                              borderTop={"none"}
-                            >
-                              <Center>
-                                <Text>{health.resyGPT}</Text>
-                              </Center>
-                            </GridItem>
-                          </Grid>
+                              <GridItem
+                                colSpan={1}
+                                rowSpan={3}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>간장질환</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={2}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>AST(SGOT)</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={3}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                              >
+                                <Center>
+                                  <Text>{health.resAST}</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={2}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>ALT(SGPT)</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={3}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                              >
+                                <Center>
+                                  <Text>{health.resALT}</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={2}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>감마지피티(y-GPT)</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={3}
+                                border={"1px solid #d9d9d9"}
+                                borderTop={"none"}
+                              >
+                                <Center>
+                                  <Text>{health.resyGPT}</Text>
+                                </Center>
+                              </GridItem>
+                            </Grid>
 
-                          <Grid
-                            templateRows="repeat(1, 1fr)"
-                            templateColumns="repeat(6, 1fr)"
-                          >
-                            <GridItem
-                              colSpan={1}
-                              rowSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderRight={"none"}
+                            <Grid
+                              templateRows="repeat(1, 1fr)"
+                              templateColumns="repeat(6, 1fr)"
                             >
-                              <Center>
-                                <Text>폐결핵 흉부질환 </Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={5}
-                              rowSpan={1}
-                              border={"1px solid #d9d9d9"}
-                            >
-                              <Center>
-                                <Text>{health.resTBChestDisease}</Text>
-                              </Center>
-                            </GridItem>
-                          </Grid>
+                              <GridItem
+                                colSpan={1}
+                                rowSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>폐결핵 흉부질환 </Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={5}
+                                rowSpan={1}
+                                border={"1px solid #d9d9d9"}
+                              >
+                                <Center>
+                                  <Text>{health.resTBChestDisease}</Text>
+                                </Center>
+                              </GridItem>
+                            </Grid>
 
-                          <Grid
-                            templateRows="repeat(1, 1fr)"
-                            templateColumns="repeat(6, 1fr)"
-                          >
-                            <GridItem
-                              colSpan={1}
-                              rowSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderRight={"none"}
+                            <Grid
+                              templateRows="repeat(1, 1fr)"
+                              templateColumns="repeat(6, 1fr)"
                             >
-                              <Center>
-                                <Text>골다공증</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={5}
-                              rowSpan={1}
-                              border={"1px solid #d9d9d9"}
-                            >
-                              <Center>
-                                <Text>
-                                  {health.resOsteoporosis
-                                    ? health.resOsteoporosis
-                                    : "비해당"}
-                                </Text>
-                              </Center>
-                            </GridItem>
-                          </Grid>
+                              <GridItem
+                                colSpan={1}
+                                rowSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>골다공증</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={5}
+                                rowSpan={1}
+                                border={"1px solid #d9d9d9"}
+                              >
+                                <Center>
+                                  <Text>
+                                    {health.resOsteoporosis
+                                      ? health.resOsteoporosis
+                                      : "비해당"}
+                                  </Text>
+                                </Center>
+                              </GridItem>
+                            </Grid>
 
-                          <Grid
-                            templateRows="repeat(1, 1fr)"
-                            templateColumns="repeat(6, 1fr)"
-                          >
-                            <GridItem
-                              colSpan={1}
-                              rowSpan={1}
-                              border={"1px solid #d9d9d9"}
-                              borderRight={"none"}
+                            <Grid
+                              templateRows="repeat(1, 1fr)"
+                              templateColumns="repeat(6, 1fr)"
                             >
-                              <Center>
-                                <Text>요단백</Text>
-                              </Center>
-                            </GridItem>
-                            <GridItem
-                              colSpan={5}
-                              rowSpan={1}
-                              border={"1px solid #d9d9d9"}
-                            >
-                              <Center>
-                                <Text>
-                                  {health.resUrinaryProtein
-                                    ? health.resUrinaryProtein
-                                    : "비해당"}
-                                </Text>
-                              </Center>
-                            </GridItem>
-                          </Grid>
-                        </Stack>
-                      </CardBody>
-                    </Card>
-                  ))}
+                              <GridItem
+                                colSpan={1}
+                                rowSpan={1}
+                                border={"1px solid #d9d9d9"}
+                                borderRight={"none"}
+                              >
+                                <Center>
+                                  <Text>요단백</Text>
+                                </Center>
+                              </GridItem>
+                              <GridItem
+                                colSpan={5}
+                                rowSpan={1}
+                                border={"1px solid #d9d9d9"}
+                              >
+                                <Center>
+                                  <Text>
+                                    {health.resUrinaryProtein
+                                      ? health.resUrinaryProtein
+                                      : "비해당"}
+                                  </Text>
+                                </Center>
+                              </GridItem>
+                            </Grid>
+                          </Stack>
+                        </CardBody>
+                      </Card>
+                    )
+                  )}
                 </Stack>
               </>
             ) : type === 2 ? (
@@ -1088,7 +1088,7 @@ export const MemberTable = (props: any) => {
                         병(의)원 약국 명
                       </Text>
                       <Text fontWeight={"bold"}>
-                        {detailItem.resHospitalName}
+                        {detailItem?.resHospitalName}
                       </Text>
                     </HStack>
                     <Grid
@@ -1157,7 +1157,7 @@ export const MemberTable = (props: any) => {
                       <>
                         {detailItem?.resMediDetailList?.length > 0 && (
                           <>
-                            {detailItem.resMediDetailList.map(
+                            {detailItem?.resMediDetailList.map(
                               (detail: any, index: number) => (
                                 <>
                                   <GridItem
@@ -1241,11 +1241,11 @@ export const MemberTable = (props: any) => {
               </Stack>
             ) : (
               <>
-                <SimpleGrid columns={3} spacing={2}>
-                  {data?.map((item: any) => (
-                    <Image src={item} key={item} width={"100%"} />
+                {/* <SimpleGrid columns={3} spacing={2}>
+                  {data?.map((item: any, index: number) => (
+                    <Image src={item} key={index} width={"100%"} />
                   ))}
-                </SimpleGrid>
+                </SimpleGrid> */}
               </>
             )}
           </ModalBody>

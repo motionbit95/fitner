@@ -23,7 +23,7 @@ export const getAllDoc = async (collectionName) => {
 
 export const getAllDoc2 = async (collectionName) => {
   // console.log("getAllDoc2", collectionName);
-  const q = query(collection(db, collectionName));
+  const q = query(collection(db, collectionName), orderBy("createdAt", "desc"));
   const docs = [];
   const querySnapshot = await getDocs(q);
   querySnapshot.forEach((doc) => {

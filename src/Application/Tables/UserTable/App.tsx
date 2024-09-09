@@ -17,7 +17,6 @@ import { MemberTable } from "./MemberTable";
 import React from "react";
 
 export const UserTable = (props: any) => {
-  console.log(props);
   const [startIndex, setStartIndex] = React.useState(0);
   const isMobile = useBreakpointValue({ base: true, md: false });
   return (
